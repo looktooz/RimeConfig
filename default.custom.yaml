@@ -1,0 +1,41 @@
+# Rime settings
+# encoding: utf-8
+
+config_version: '2.0'
+
+customization:
+  distribution_code_name: Weasel
+  distribution_version: 0.16.3
+  generator: "Rime::SwitcherSettings"
+  modified_time: "Fri Nov  8 09:43:10 2024"
+  rime_version: 1.11.2
+
+patch:
+  schema_list:
+    - schema: wubi
+    - schema: rime_ice
+  switcher:
+    caption: "【 输入法设置 】"
+    hotkeys:
+     #- F4
+      - Control+0
+     #- Alt+grave
+    option_list_separator: "｜"
+    save_options:  # 开关记忆（方案中的 switches），从方案选单（而非快捷键）切换时会记住的选项，需要记忆的开关不能设定 reset
+      - ascii_punct
+      - traditionalization
+      - emoji
+      - full_shape
+    fold_options: true            # 呼出时是否折叠，多方案时建议折叠 true ，一个方案建议展开 false
+    abbreviate_options: true      # 折叠时是否缩写选项
+    option_list_separator: ' / '  # 折叠时的选项分隔符
+
+  ascii_composer:
+    good_old_caps_lock: true # true   切换大写；false  切换中英
+    # commit_code：上屏原始的编码，然后切换到英文；commit_text：上屏拼出的词句，然后切换到英文；clear：清除未上屏内容，然后切换到英文；inline_ascii：切换到临时英文模式，按回车上屏后回到中文状态；noop：屏蔽快捷键，不切换中英，但不要屏蔽 CapsLock
+    switch_key:
+      Caps_Lock: clear        # commit_code | commit_text | clear
+      Control_L: noop
+      Control_R: noop
+      Shift_L: inline_ascii   # Shift_L 左Shift
+      Shift_R: noop           # Shift_R 右Shift
