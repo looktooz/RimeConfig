@@ -186,7 +186,7 @@ recognizer:
     datetime: "^dt$"
     timestamp: "^ts$"
     url: "^(www[.]|https?:|ftp[.:]|mailto:|file:).*$|^[a-z]+[.].+$"
-    number: number: "^[A-TV-Z]+[0-9]+$|^[A-TV-Z]+[0-9]+\\.[0-9]+$"
+    number: "^[A-TV-Z]+[0-9]+$|^[A-TV-Z]+[0-9]+\\.[0-9]+$"
 
 punctuator:
   full_shape:
@@ -275,4 +275,5 @@ key_binder:
     - {when: has_menu, accept: Shift+Tab, send: Page_Up}
     - {when: always, accept: Control+Shift+3, toggle: ascii_punct}
     - {when: always, accept: Control+semicolon, toggle: ascii_punct}
+
     - {when: always, accept: Control+Shift+4, toggle: traditionalization}
