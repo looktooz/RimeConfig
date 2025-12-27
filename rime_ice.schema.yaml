@@ -1,0 +1,428 @@
+schema:
+  schema_id: rime_ice
+  name: "雾凇拼音"
+  version: "2024-12-06"
+  author:
+    - Dvel
+  description: |
+    雾凇拼音
+    https://github.com/iDvel/rime-ice
+  dependencies:
+    - melt_eng
+
+switches:
+  - name: full_shape
+    states: [ 半角, 全角 ]
+  - name: extended_charset
+    states: [ 常用, 扩展 ]
+  - name: ascii_punct
+    states: [ ¥, $ ]
+
+engine:
+  processors:
+    - lua_processor@select_character
+    - ascii_composer
+    - recognizer
+    - key_binder
+    - speller
+    - punctuator
+    - selector
+    - navigator
+    - express_editor
+    - lua_processor@*cold_word_drop_processor
+  segmentors:
+    - ascii_segmentor
+    - matcher
+    - abc_segmentor
+    - punct_segmentor
+    - fallback_segmentor
+  translators:
+    - punct_translator
+    - reverse_lookup_translator
+    - table_translator
+    - lua_translator@*date_translator
+    - lua_translator@*number_translator
+    - table_translator@*long_word_filter
+    - table_translator@*is_in_user_dict
+    - table_translator@custom_phrase
+  filters:
+    - simplifier@tradition
+    - lua_filter@*reduce_english_filter
+    - uniquifier
+    - lua_filter@*pin_cand_filter
+    - lua_filter@*long_word_filter
+    - lua_filter@*autocap_filter
+#    - lua_filter@*single_char_first_filter
+#    - lua_filter@*single_char_only
+
+translator:
+  dictionary: rime_ice
+  db_class: tabledb
+  initial_quality: 1.5
+  enable_charset_filter: false
+  enable_sentence: true
+  enable_user_dict: true
+  enable_encoder: true
+  encode_commit_history: true
+  enable_completion: true
+  preedit_format:
+    - xform/([jqxy])v/$1u/
+    - xform/([nl])v/$1v/
+    - xform/([nl])ue/$1ve/
+  disable_user_dict_for_patterns:
+    - "^z.*$"
+
+melt_eng:
+  dictionary: melt_eng
+  enable_sentence: false
+  enable_user_dict: false
+  initial_quality: 1.0
+  comment_format:
+    - xform/.*//
+
+custom_phrase:
+  dictionary: ""
+  user_dict: custom_phrase
+  db_class: stabledb
+  enable_completion: false
+  enable_sentence: false
+  initial_quality: 99
+
+abc_segmentor:
+  extra_tags:
+    - reverse_lookup
+
+reverse_lookup:
+  dictionary: rime_ice
+  preedit_format:
+    - xform/([nl])v/$1ü/
+    - xform/([nl])ue/$1üe/
+    - xform/([jqxy])v/$1u/
+
+date_translator:
+  date: rq
+  time: sj
+  week: xq
+  datetime: dt
+  timestamp: ts
+
+speller:
+  alphabet: zyxwvutsrqponmlkjihgfedcbaZYXWVUTSRQPONMLKJIHGFEDCBA`/
+  initials: zyxwvutsrqponmlkjihgfedcbaZYXWVUTSRQPONMLKJIHGFEDCBA
+  delimiter: " '"
+  algebra:
+    - derive/^n/l/
+    - derive/eng$/en/
+    - derive/en$/eng/
+    - derive/in$/ing/
+    - derive/ing$/in/
+    - derive/ong$/un/
+    - derive/un$/ong/
+    - derive/ong$/on/
+    - derive/iong$/un/
+    - derive/un$/iong/
+    - derive/ong$/eng/
+    - derive/eng$/ong/
+    - erase/^hm$/
+    - erase/^m$/
+    - erase/^n$/
+    - erase/^ng$/
+    - abbrev/^([a-z]).+$/$1/
+    - abbrev/^([zcs]h).+$/$1/
+    - derive/^([nl])ve$/$1ue/
+    - derive/^([jqxy])u/$1v/
+    - derive/^([nl])ue$/$1ve/
+    - derive/^([jqxy])v/$1u/
+    - derive/([zcs])h(a|e|i|u|ai|ei|an|en|ou|uo|ua|un|ui|uan|uai|uang|ang|eng|ong)$/h$1$2/
+    - derive/([zcs])h([aeiu])$/$1$2h/
+    - derive/([qjx])ia$/$1ai/
+    - derive/([wrtypsdfghklzcbnm])an$/$1na/
+    - derive/([wrpsdfghklzcbnm])en$/$1ne/
+    - derive/([qypjlxbnm])in$/$1ni/
+    - derive/([qrtysdghjklzxc])un$/$1nu/
+    - derive/([qtpdjlxbnm])ian$/$1ain/
+    - derive/^([wghk])ai$/$1ia/
+    - derive/([wfghkz])ei$/$1ie/
+    - derive/([jqx])ie$/$1ei/
+    - derive/([rtypsdghklzcbnm])ao$/$1oa/
+    - derive/([ypfm])ou$/$1uo/
+    - derive/([wrtypsdfghklzcbnm])ang$/$1nag/
+    - derive/([wrtypsdfghklzcbnm])ang$/$1agn/
+    - derive/([wrtpsdfghklzcbnm])eng$/$1neg/
+    - derive/([wrtpsdfghklzcbnm])eng$/$1egn/
+    - derive/([qtypdjlxbnm])ing$/$1nig/
+    - derive/([qtypdjlxbnm])ing$/$1ign/
+    - derive/([rtysdghklzcn])ong$/$1nog/
+    - derive/([rtysdghklzcn])ong$/$1ogn/
+    - derive/([qtpdjlxbnm])iao$/$1ioa/
+    - derive/([qtpdjlxbnm])iao$/$1oia/
+    - derive/([rtsghkzc])ui$/$1iu/
+    - derive/([qjlxnm])iu$/$1ui/
+    - derive/([qjlxn])iang$/$1aing/
+    - derive/([qjlxn])iang$/$1inag/
+    - derive/([g|k|h|zh|sh])ua$/$1au/
+    - derive/([g|h|k|zh|ch|sh])uai$/$1aui/
+    - derive/([qrtysdghjklzxcn])uan$/$1aun/
+    - derive/([nlyjqx])ue$/$1eu/
+    - derive/([g|h|k|zh|ch|sh])uang$/$1aung/
+    - derive/([g|h|k|zh|ch|sh])uang$/$1uagn/
+    - derive/([g|h|k|zh|ch|sh])uang$/$1unag/
+    - derive/([g|h|k|zh|ch|sh])uang$/$1augn/
+    - derive/([jqx])iong$/$1inog/
+    - derive/([jqx])iong$/$1oing/
+    - derive/([jqx])iong$/$1iogn/
+    - derive/([jqx])iong$/$1oign/
+    - derive/([rtsdghkzc])o(u|ng)$/$1o/
+    - derive/(.+)ong$/$1on/
+    - derive/([tl])eng$/$1en/
+    - derive/([qwrtypsdfghjklzxcbnm])([aeio])ng$/$1ng/
+
+reduce_english_filter:
+  mode: custom
+  idx: 2
+  words: [
+    aid, ann,
+    bail, bait, bam, band, bans, bat, bay, bend, bent, benz, bib, bid, bien, biz, boc, bop, bos, bud, buf, bach, bench, bush,
+    cab, cad, cain, cam, cans, cap, cas, cef, chad, chan, chap, chef, cher, chew, chic, chin, chip, chit, coup, cum, cunt, cur, couch,
+    dab, dag, dal, dam, dent, dew, dial, diet, dim, din, dip, dis, dit, doug, dub, dug, dunn, don,
+    fab, fax, fob, fog, foul, fur,
+    gag, gail, gain, gal, gam, gaol, ged, gel, ger, guam, gus, gut,
+    hail, ham, hank, hans, hat, hay, heil, heir, hem, hep, hud, hum, hung, hunk, hut, hush,
+    jim, jug,
+    kat,
+    lab, lad, lag, laid, lam, laos, lap, lat, lax, lay, led, leg, lex, liam, lib, lid, lied, lien, lies, linn, lip, lit, liz, lob, lug, lund, lung, lux, lash, loch, lush,
+    mag, maid, mann, mar, mat, med, mel, mend, mens, ment, mil, mins, mint, mob, moc, mop, mos, mot, mud, mug, mum, mesh,
+    nap, nat, nay, neil, nib, nip, noun, nous, nun, nut, nail, nash,
+    pac, paid, pail, pain, pair, pak, pal, pam, pans, pant, pap, par, pat, paw, pax, pens, pic, pier, pies, pins, pint, pit, pix, pod, pop, pos, pot, pour, pow, pub, pinch, pouch,
+    rand, rant, rent, rep, res, ret, rex, rib, rid, rig, rim, rub, rug, rum, runc, runs, ranch,
+    sac, sail, sal, sam, sans, sap, saw, sax, sew, sham, shaw, shin, sig, sin, sip, sis, suit, sung, suns, sup, sur, sus,
+    tad, tail, taj, tar, tax, tec, ted, tel, ter, tex, tic, tied, tier, ties, tim, tin, tit, tour, tout, tum,
+    wag, wand, womens, wap, wax, weir, won,
+    yan, yen,
+    zach
+  ]
+
+long_word_filter:
+  count: 2
+  idx: 4
+
+pin_cand_filter:
+  - q 去 千
+  - w 我 万 往
+  - e 呃
+  - r 让 人
+  - t 他 她 它 祂
+  - y 与 于
+  - o 哦
+  - p 片 篇
+  - a 啊
+  - s 是 时 使 式
+  - d 的 地 得
+  - f 发 放 分
+  - g 个 各
+  - h 和 或
+  - j 及 将 即 既 继
+  - k 可
+  - l 了 啦 喽 嘞
+  - z 在 再 自
+  - x 想 像 向
+  - c 才 从
+  - b 吧 把 呗 百
+  - n 那 哪 拿 呐
+  - m 吗 嘛 呣 呒
+  - qing  请
+  - qu  去
+  - wo  我
+  - wei 为
+  - er  而 儿 二
+  - en  嗯
+  - rang  让
+  - ta  他 她 它 祂
+  - tai 太
+  - tong  同
+  - yu  与 于
+  - you 有 又 由
+  - yao 要
+  - ye  也
+  - shi 是 时 使 式
+  - suo 所
+  - shang 上
+  - shuo  说
+  - de  的 地 得
+  - dan 但
+  - dou 都
+  - dao 到 倒
+  - dian  点
+  - dang  当
+  - dui 对
+  - fa  发
+  - ge  个 各
+  - gang  刚
+  - he  和
+  - huo 或
+  - hui 会
+  - hai 还
+  - hao 好
+  - ji  及 即 既
+  - jiu 就
+  - jiang 将
+  - ke  可
+  - kan 看
+  - kai 开
+  - le  了
+  - la  啦 拉
+  - lai 来
+  - li  里
+  - zai 在 再
+  - zhi 只
+  - zhe 这 着
+  - zhen  真
+  - zui 最
+  - zheng 正
+  - zuo 做 坐 左
+  - ze  则
+  - xiang 想 像 向
+  - xian  先
+  - xia 下
+  - xing  行
+  - cai 才
+  - cong  从
+  - chu 出
+  - ba  把 吧
+  - bu  不
+  - bing  并
+  - bei 被
+  - bie 别
+  - bi  比
+  - bing  并
+  - na  那 哪 拿 呐
+  - ni  你
+  - ma  吗 嘛 妈
+  - mei 没
+  - mai 买 卖
+  - reng  仍 扔
+  - ta men  他们 她们 它们
+  - tm  他们 她们 它们
+  - ta de 他的 她的 它的
+  - td  他的 她的 它的
+  - ta men de 他们的 她们的 它们的
+  - na er 那儿 哪儿
+  - na ge 那个 哪个
+  - ng  那个 哪个 拿个
+  - na xie  那些 哪些
+  - na li 那里 哪里
+  - na bian 那边 哪边
+  - na bian er  那边儿 哪边儿
+  - na wei  那位 哪位
+  - zh  这
+  - dd  等等
+  - dddd  等等等等
+  - gg  刚刚
+  - cgg 才刚刚
+  - zd  知道
+  - bzd 不知道
+  - ww  往往
+  - hh  哈哈
+  - kk  看看
+  - cc  常常
+  - xx  想想 想象
+  - yw  因为
+  - sm  什么
+  - wsm 为什么
+  - sbs 是不是
+  - msm 没什么
+  - smd 什么的
+  - sms 什么是
+  - sma 什么啊
+
+punctuator:
+  full_shape:
+    ' ' : { commit: '　' }
+    ',' : { commit: ， }
+    '.' : { commit: 。 }
+    '<' : [ 《, 〈, «, ‹ ]
+    '>' : [ 》, 〉, », › ]
+    '/' : [ ／, ÷ ]
+    '?' : { commit: ？ }
+    ';' : { commit: ； }
+    ':' : { commit: ： }
+    '''' : { pair: [ '‘', '’' ] }
+    '"' : { pair: [ '“', '”' ] }
+    '\' : [ 、, ＼ ]
+    '|' : [ ·, ｜, '§', '¦' ]
+    '`' : ｀
+    '~' : ～
+    '!' : { commit: ！ }
+    '@' : [ ＠, ☯ ]
+    '#' : [ ＃, ⌘ ]
+    '%' : [ ％， '°', '℃' ]
+    '$' : [ ￥, '$', '€', '£', '¥', '¢', '¤' ]
+    '^' : { commit: …… }
+    '&' : ＆
+    '*' : [ ＊, ·, ・, ×, ※, ❂ ]
+    '(' : （
+    ')' : ）
+    '-' : －
+    '_' : ——
+    '+' : ＋
+    '=' : ＝
+    '[' : [ 「, 【, 〔, ［ ]
+    ']' : [ 」, 】, 〕, ］ ]
+    '{' : [ 『, 〖, ｛ ]
+    '}' : [ 』, 〗, ｝ ]
+  half_shape:
+    ',' : '，'
+    '.' : '。'
+    '<' : '《'
+    '>' : '》'
+    '/' : '/'
+    '?' : '？'
+    ';' : '；'
+    ':' : '：'
+    '''' : { pair: [ '‘', '’' ] }
+    '"' : { pair: [ '“', '”' ] }
+    '\' : '、'
+    '|' : ' | '
+    '`' : '`'
+    '~' : '~'
+    '!' : '！'
+    '@' : '@'
+    '#' : '#'
+    '%' : '%'
+    '$' : '¥'
+    '^' : '……'
+    '&' : '&'
+    '*' : '*'
+    '(' : '（'
+    ')' : '）'
+    '-' : '-'
+    '_' : ——
+    '+' : '+'
+    '=' : '='
+    '[' : '【'
+    ']' : '】'
+    '{' : '「'
+    '}' : '」'
+
+key_binder:
+  bindings:
+    - {accept: semicolon, send: 2, when: has_menu}
+    - {accept: apostrophe, send: 3, when: has_menu}
+    - {accept: Return, send: Shift+Enter, when: composing}
+    - {when: has_menu, accept: Tab, send: Page_Down}
+    - {when: has_menu, accept: Shift+Tab, send: Page_Up}
+    - {when: always, accept: Control+Shift+3, toggle: ascii_punct}
+    - {when: always, accept: Control+semicolon, toggle: ascii_punct}
+    - {when: always, accept: Control+Shift+4, toggle: traditionalization}
+
+recognizer:
+  import_preset: default
+  patterns:
+    reverse_lookup: "^/[a-z]*'?$"
+    date: "^rq$"
+    time: "^sj$"
+    week: "^xq$"
+    datetime: "^dt$"
+    timestamp: "^ts$"
+    url: "^(www[.]|https?:|ftp[.:]|mailto:|file:).*$|^[a-z]+[.].+$"
+    number: "^[A-TV-Z]+[0-9]+$|^[A-TV-Z]+[0-9]+\\.[0-9]+$"
