@@ -1,0 +1,104 @@
+customization:
+  distribution_code_name: Weasel
+  distribution_version: 0.17.3
+  generator: "Weasel::UIStyleSettings"
+  modified_time: "Sun Jul  6 11:46:31 2025"
+  rime_version: 1.13.1
+patch:
+  # 从 weasel.yaml 合并的配置
+  "config_version": "2024-12-04"
+
+  "app_options":
+    firefox.exe:
+      inline_preedit: true
+
+  "global_settings":
+    show_notifications: true
+    show_notifications_time: 1200
+    global_ascii: false
+
+  "style":
+    color_scheme: youtube
+    font_face: "Segoe UI Emoji, Microsoft YaHei, SF Pro, Noto Color Emoji"
+    label_font_face: "Microsoft YaHei"
+    comment_font_face: "Microsoft YaHei"
+    font_point: 14
+    label_font_point: 14
+    comment_font_point: 14
+    inline_preedit: true
+    preedit_type: composition
+    fullscreen: false
+    horizontal: true
+    vertical_text: false
+    vertical_text_left_to_right: false
+    vertical_text_with_wrap: false
+    vertical_auto_reverse: false
+    label_format: "%s"
+    mark_text: ""
+    ascii_tip_follow_cursor: false
+    enhanced_position: true
+    display_tray_icon: false
+    antialias_mode: default
+    candidate_abbreviate_length: 30
+    mouse_hover_ms: 0
+    hover_type: none
+    paging_on_scroll: true
+    click_to_capture: false
+
+    layout:
+      baseline: 0
+      linespacing: 0
+      align_type: center
+      max_height: 600
+      max_width: 0
+      min_height: 0
+      min_width: 10
+      border_width: 0
+      margin_x: 8
+      margin_y: 8
+      spacing: 13
+      candidate_spacing: 22
+      hilite_spacing: 6
+      hilite_padding: 8
+      shadow_radius: 0
+      shadow_offset_x: 4
+      shadow_offset_y: 4
+      corner_radius: 8
+      round_corner: 8
+
+  "preset_color_schemes":
+    nord:
+      name: "远山／Nord"
+      author: Mirtle
+      color_format: rgba
+      text_color: 0x2E3440
+      shadow_color: 0x000000b4
+      label_color: 0x4C566A
+      comment_text_color: 0xD08770
+      border_color: 0xECEFF4
+      back_color: 0xECEFF4
+      candidate_back_color: 0xECEFF4
+      candidate_text_color: 0x2E3440
+      hilited_text_color: 0x000000
+      hilited_back_color: 0xEBCB8B
+      hilited_mark_color: 0xBF616A
+      hilited_label_color: 0x4C566A
+      hilited_comment_text_color: 0xBF616A
+      hilited_candidate_text_color: 0x2E3440
+      hilited_candidate_border_color: 0x8FBCBB
+      hilited_candidate_back_color: 0x8FBCBB
+
+    youtube:
+      name: "YouTube"
+      author: "Patricivs <ipatrickmac@me.com>"
+      text_color: 0x000000
+      back_color: 0xdedede
+      border_color: 0xdedede
+      label_color: 0x000000
+      hilited_text_color: 0x230dc3
+      hilited_back_color: 0xffffff
+      candidate_text_color: 0x000000
+      comment_text_color: 0x000000
+      hilited_candidate_text_color: 0xffffff
+      hilited_comment_text_color: 0xffffff
+      hilited_candidate_back_color: 0x230dc3
