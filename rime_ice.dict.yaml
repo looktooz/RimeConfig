@@ -1,0 +1,40 @@
+# Rime dictionary
+# encoding: utf-8
+
+---
+name: rime_ice
+version: "2024-11-27"
+import_tables:
+  - cn_dicts/8105     # 字表
+  - cn_dicts/41448    # 大字表（按需启用）（启用时和 8105 同时启用并放在 8105 下面）
+  - cn_dicts/base     # 基础词库
+  - cn_dicts/ext      # 扩展词库
+  - cn_dicts/tencent  # 腾讯词向量（大词库，部署时间较长）
+  - cn_dicts/others   # 一些杂项
+  - cn_dicts/wubi.user         # 自用词、不规定造词
+  # 细胞词库
+#  - cn_dicts/medication
+#  - cn_dicts/industry_product
+#  - cn_dicts/exthot
+#  - cn_dicts/chess
+#  - cn_dicts/chess2
+#  - cn_dicts/animal
+#  - cn_dicts/game
+#  - cn_dicts/idiom
+#  - cn_dicts/sport
+#  - cn_dicts/media
+#  - cn_dicts/shulihua
+#  - cn_dicts/food
+#  - cn_dicts/inputmethod
+#  - cn_dicts/history
+#  - cn_dicts/place
+#  - cn_dicts/geography
+#  - cn_dicts/name2
+#  - cn_dicts/literature
+#  - cn_dicts/music
+#  - cn_dicts/computer
+#  - cn_dicts/composite
+#  - cn_dicts/name
+  # 建议把扩展词库放到下面，有重复词条时，最上面的权重生效
+  # - cn_dicts/mydict
+...
