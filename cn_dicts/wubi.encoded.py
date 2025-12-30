@@ -220,6 +220,15 @@ def rule_all_two_codes(phrase, char_codes):
 
     return result[:4]
 
+def rule_free_coding(phrase, char_codes):
+    """
+    规则五：自由编码规则
+    - 用户手动输入自定义编码
+    """
+    # 对于规则五，我们不需要自动生成编码
+    # 编码将由用户输入，这里返回空字符串
+    return ""
+
 def generate_wubi_code(phrase, char_codes, rule=1):
     """
     根据指定规则为词语生成编码
@@ -227,7 +236,7 @@ def generate_wubi_code(phrase, char_codes, rule=1):
     Args:
         phrase: 待编码的词语
         char_codes: 单字编码字典
-        rule: 编码规则，1-4分别对应四种规则
+        rule: 编码规则，1-5分别对应五种规则
     """
     if rule == 1:
         return rule_standard_wubi(phrase, char_codes)
@@ -237,6 +246,8 @@ def generate_wubi_code(phrase, char_codes, rule=1):
         return rule_first_two_chars_two_codes_rest_one(phrase, char_codes)
     elif rule == 4:
         return rule_all_two_codes(phrase, char_codes)
+    elif rule == 5:
+        return rule_free_coding(phrase, char_codes)
     else:
         # 默认使用规则一
         return rule_standard_wubi(phrase, char_codes)
@@ -320,17 +331,22 @@ def select_encoding_rule():
     print()
     print("4. 每个字都取前两码编码规则：")
     print("   每个汉字都取前两码，然后拼接，直到达到4码")
+    print()
+    print("5. 自由编码规则：")
+    print("   用户为每个词组输入自定义编码")
+    print("   编码可以是任意长度的字母")
+    print("   支持词组包含汉字、字母、数字、标点等任意字符")
     print("=" * 50)
 
     while True:
         try:
-            choice = input("请输入选择的规则编号 (1-4): ").strip()
-            if choice in ['1', '2', '3', '4']:
+            choice = input("请输入选择的规则编号 (1-5): ").strip()
+            if choice in ['1', '2', '3', '4', '5']:
                 rule = int(choice)
                 print(f"已选择规则 {rule}")
                 return rule
             else:
-                print("输入错误，请输入1-4之间的数字")
+                print("输入错误，请输入1-5之间的数字")
         except KeyboardInterrupt:
             print("\n用户取消操作")
             sys.exit(0)
@@ -390,16 +406,43 @@ def interactive_single_input(phrase, rule, char_codes, phrase_weights, existing_
         print(f"  词组 '{phrase}' 已存在于词库中，跳过")
         return False, "已存在"
 
-    # 检查词组中的所有汉字是否都存在于编码表中
-    if not check_all_chars_exist(phrase, char_codes):
-        print(f"  警告: 词组 '{phrase}' 中包含未编码的汉字")
-        return False, "包含未编码汉字"
+    # 对于规则五（自由编码），不需要检查汉字是否在编码表中
+    if rule != 5:
+        # 检查词组中的所有汉字是否都存在于编码表中
+        if not check_all_chars_exist(phrase, char_codes):
+            print(f"  警告: 词组 '{phrase}' 中包含未编码的汉字")
+            return False, "包含未编码汉字"
 
-    # 提取中文字符用于编码
-    chinese_chars = extract_chinese_chars(phrase)
+    # 对于规则五（自由编码），直接使用用户输入的词组
+    if rule == 5:
+        # 规则五：自由编码，需要用户输入
+        while True:
+            try:
+                user_code = input(f"  请为词组 '{phrase}' 输入自定义编码: ").strip()
+                if not user_code:
+                    print("  错误: 编码不能为空，请重新输入")
+                    continue
+                # 验证编码格式：只能是字母，任意长度
+                if not re.match(r'^[a-zA-Z]+$', user_code):
+                    print("  错误: 编码只能包含字母，请重新输入")
+                    continue
+                code = user_code.lower()  # 转换为小写
+                break
+            except KeyboardInterrupt:
+                print("\n  用户取消输入")
+                return False, "用户取消"
+            except Exception as e:
+                print(f"  输入错误: {e}")
+                return False, str(e)
+    else:
+        # 其他规则：需要提取中文字符用于编码
+        chinese_chars = extract_chinese_chars(phrase)
+        if not chinese_chars:
+            print(f"  警告: 词组 '{phrase}' 中不包含中文字符")
+            return False, "不包含中文字符"
 
-    # 生成编码（只使用中文字符）
-    code = generate_wubi_code(chinese_chars, char_codes, rule)
+        # 生成编码（只使用中文字符）
+        code = generate_wubi_code(chinese_chars, char_codes, rule)
 
     # 获取权重（使用最大权重）
     weight = phrase_weights.get(phrase, "100")
@@ -435,6 +478,10 @@ def interactive_input_mode(rule, char_codes, phrase_weights):
 
     print("\n" + "=" * 50)
     print("交互式输入模式")
+    if rule == 5:
+        print("注意: 您选择了自由编码规则")
+        print("  1. 可以输入任意字符的词组（汉字、字母、数字、标点等）")
+        print("  2. 需要为每个词组输入自定义编码（只能包含字母，任意长度）")
     print("输入词组并回车，程序将自动编码并追加到词库")
     print("连续输入两个空行（直接按两次回车）退出程序")
     print("=" * 50)
@@ -531,6 +578,12 @@ def file_batch_mode(rule, char_codes, phrase_weights, input_file):
     record_dir = r"D:\OneDrive\Backup\RimeSync\update_record"
     print(f"处理记录将保存到: {record_dir}")
 
+    # 对于规则五（自由编码），不支持文件批量处理
+    if rule == 5:
+        print("错误: 自由编码规则不支持文件批量处理模式")
+        print("请使用交互式输入模式为每个词组输入自定义编码")
+        return 0, 0, output_filename, fail_filename
+
     # 读取已存在的词语
     existing_phrases = read_existing_entries(output_filename)
     print(f"\n当前词库中已有 {len(existing_phrases)} 个词语")
@@ -599,6 +652,13 @@ def file_batch_mode(rule, char_codes, phrase_weights, input_file):
 
             # 提取中文字符用于编码
             chinese_chars = extract_chinese_chars(line)
+
+            # 如果没有中文字符，跳过
+            if not chinese_chars:
+                fail_count += 1
+                fail_records.append({'phrase': line, 'reason': '不包含中文字符'})
+                print(f"  行 {line_num}: 词组 '{line}' 中不包含中文字符，跳过")
+                continue
 
             # 生成编码（只使用中文字符）
             code = generate_wubi_code(chinese_chars, char_codes, rule)
@@ -700,6 +760,11 @@ def auto_mode(rule, char_codes, phrase_weights):
     print("请输入词组或文件路径（可直接拖入文件）")
     print("输入词组：对单个词组进行编码")
     print("输入文件路径：对文件中的每一行进行批量编码")
+
+    if rule == 5:
+        print("注意: 您选择了自由编码规则，不支持文件批量处理")
+        print("文件路径将被视为普通词组处理")
+
     print("连续输入两个空行退出程序")
     print("=" * 50)
 
@@ -731,7 +796,10 @@ def auto_mode(rule, char_codes, phrase_weights):
                 empty_line_count = 0
 
                 # 检查是否为文件路径
-                if is_file_path(user_input):
+                is_file = is_file_path(user_input)
+
+                # 对于规则五（自由编码），不支持文件批量处理
+                if is_file and rule != 5:
                     print(f"✓ 检测到文件路径，进入文件批量处理模式")
                     # 处理拖入文件可能带有的引号
                     file_path = user_input
@@ -749,6 +817,10 @@ def auto_mode(rule, char_codes, phrase_weights):
                         if failed > 0:
                             print(f"  失败条目已保存到: {fail_file}")
                 else:
+                    if is_file and rule == 5:
+                        print(f"⚠ 检测到文件路径，但自由编码规则不支持批量处理")
+                        print(f"  将文件路径作为普通词组处理")
+
                     print(f"✓ 检测到词组，进入交互式处理模式")
                     # 处理单个词组
                     success, result = interactive_single_input(user_input, rule, char_codes, phrase_weights, existing_phrases)
@@ -816,21 +888,33 @@ def main():
 
     print("-" * 50)
 
-    # 进入自动模式
-    interactive_count, file_count, fail_count = auto_mode(rule, char_codes, phrase_weights)
+    # 对于规则五（自由编码），直接进入交互式输入模式
+    if rule == 5:
+        print("注意: 您选择了自由编码规则，将进入交互式输入模式")
+        print("您可以输入任意字符的词组，并为每个词组输入自定义编码")
+        added_count, fail_count, output_filename = interactive_input_mode(rule, char_codes, phrase_weights)
 
-    print("\n" + "=" * 50)
-    print("程序执行完成")
-    print("统计信息:")
-    print(f"  交互式处理词组: {interactive_count} 个")
-    print(f"  批量处理文件: {file_count} 个")
-    print(f"  失败条目: {fail_count} 个")
-    print("=" * 50)
+        print("\n" + "=" * 50)
+        print("程序执行完成")
+        print("统计信息:")
+        print(f"  成功添加: {added_count} 个词组")
+        print(f"  失败: {fail_count} 个")
+        print("=" * 50)
+    else:
+        # 进入自动模式
+        interactive_count, file_count, fail_count = auto_mode(rule, char_codes, phrase_weights)
+
+        print("\n" + "=" * 50)
+        print("程序执行完成")
+        print("统计信息:")
+        print(f"  交互式处理词组: {interactive_count} 个")
+        print(f"  批量处理文件: {file_count} 个")
+        print(f"  失败条目: {fail_count} 个")
+        print("=" * 50)
 
     # 检查是否有成功添加的词语
-    if interactive_count > 0 or file_count > 0:
-        output_filename = "wubi.user.dict.yaml"
-
+    output_filename = "wubi.user.dict.yaml"
+    if os.path.exists(output_filename):
         # 显示最后添加的几个词语
         try:
             with open(output_filename, 'r', encoding='utf-8') as f:
